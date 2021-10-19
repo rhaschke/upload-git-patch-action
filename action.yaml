@@ -1,0 +1,28 @@
+name: "Upload git diff as artifact"
+description: "Make a git diff and upload the patch as an artifact for local application"
+
+inputs:
+  name:
+    description: "Name of patch file / artifact"
+    required: true
+
+outputs:
+  have_diff:
+    description: "indicator whether diff was created (1) or not (0)"
+    value: ${{ steps.diff.outputs.diff }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Create git patch"
+      id: diff
+      shell: bash
+      run: |
+        echo "::set-output name=diff::$(! git diff --quiet)"
+        git diff > /tmp/${{ inputs.name }}.patch
+    - name: Upload patch
+      uses: actions/upload-artifact@v2
+      if: ${{ steps.diff.outputs.diff }}
+      with:
+        name: ${{ inputs.name }}
+        path: /tmp/${{ inputs.name }}.patch
