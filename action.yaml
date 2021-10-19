@@ -18,11 +18,19 @@ runs:
       id: diff
       shell: bash
       run: |
-        echo "::set-output name=diff::$(! git diff --quiet)"
-        git diff > /tmp/${{ inputs.name }}.patch
+        if ! git diff --quiet ; then
+          echo "::set-output name=diff::1"
+          git diff > /tmp/${{ inputs.name }}.patch
+        else
+          echo "::set-output name=diff::0"
+        fi
     - name: Upload patch
       uses: actions/upload-artifact@v2
-      if: ${{ steps.diff.outputs.diff }}
+      # if: ${{ steps.diff.outputs.diff }} doesn't work:
+      # Conditions are not supported for composite actions.
+      # https://github.com/actions/runner/blob/main/docs/adrs/0549-composite-run-steps.md#if-condition
       with:
         name: ${{ inputs.name }}
         path: /tmp/${{ inputs.name }}.patch
+        # workaround for missing if condition:
+        if-no-files-found: ignore
