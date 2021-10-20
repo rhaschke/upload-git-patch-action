@@ -5,6 +5,10 @@ inputs:
   name:
     description: "Name of patch file / artifact"
     required: true
+  path:
+    description: "Path to git workspace"
+    required: true
+    default: .
 
 outputs:
   have_diff:
@@ -18,9 +22,10 @@ runs:
       id: diff
       shell: bash
       run: |
+        cd "${{ inputs.path }}"
         if ! git diff --quiet ; then
           echo "::set-output name=diff::1"
-          git diff > /tmp/${{ inputs.name }}.patch
+          git diff > "/tmp/${{ inputs.name }}.patch"
         else
           echo "::set-output name=diff::0"
         fi
