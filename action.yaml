@@ -25,6 +25,7 @@ runs:
         cd "${{ inputs.path }}"
         if ! git diff --quiet ; then
           echo "::set-output name=diff::1"
+          echo "::warning title=patches available from ${{ inputs.name }}::Download and unzip artifact, and eventually apply patches via: git apply ${{ inputs.name }}.patch"
           git diff > "/tmp/${{ inputs.name }}.patch"
         else
           echo "::set-output name=diff::0"
