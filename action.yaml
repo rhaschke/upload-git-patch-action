@@ -24,11 +24,11 @@ runs:
       run: |
         cd "${{ inputs.path }}"
         if ! git diff --quiet ; then
-          echo "::set-output name=diff::1"
+          echo "diff=1" >> "$GITHUB_OUTPUT"
           echo "::warning title=patches available from ${{ inputs.name }}::Download and unzip artifact, and eventually apply patches via: git apply ${{ inputs.name }}.patch"
           git diff > "/tmp/${{ inputs.name }}.patch"
         else
-          echo "::set-output name=diff::0"
+          echo "diff=0" >> "$GITHUB_OUTPUT"
         fi
     - name: Upload patch
       uses: actions/upload-artifact@v2
